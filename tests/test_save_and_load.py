@@ -26,8 +26,12 @@ class TestSaveAll:
         gen.save_all(raw_dir, seeds_dir)
 
         expected_files = [
-            "raw_employees.csv", "raw_absences.csv", "raw_payroll.csv",
-            "raw_promotions.csv", "raw_training.csv", "raw_surveys.csv",
+            "raw_employees.csv",
+            "raw_absences.csv",
+            "raw_payroll.csv",
+            "raw_promotions.csv",
+            "raw_training.csv",
+            "raw_surveys.csv",
             "raw_recruiting.csv",
         ]
         for f in expected_files:

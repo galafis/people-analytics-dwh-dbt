@@ -10,8 +10,7 @@ Generates 7 realistic HR tables with correlated distributions:
 - recruiting: Full hiring funnel (application → screening → interview → offer → hire)
 
 All dates span 2019-01-01 to 2024-12-31, simulating a ~2000-employee organization.
-Distributions are calibrated against published People Analytics benchmarks
-(SHRM 2023 Human Capital Benchmarking, BLS JOLTS, Gallup Q12).
+Distributions are illustrative assumptions for testing; they are not empirical benchmarks.
 """
 
 from __future__ import annotations
@@ -123,9 +122,19 @@ class PeopleAnalyticsDataGenerator:
         end_date: str = "2024-12-31",
         random_state: int = 42,
     ):
+        if isinstance(n_employees, bool) or not isinstance(n_employees, int) or n_employees < 1:
+            raise ValueError("n_employees must be a positive integer / deve ser inteiro positivo")
         self.n_employees = n_employees
         self.start_date = pd.Timestamp(start_date)
         self.end_date = pd.Timestamp(end_date)
+        if (
+            pd.isna(self.start_date)
+            or pd.isna(self.end_date)
+            or (self.end_date - self.start_date).days < 365
+        ):
+            raise ValueError(
+                "Date range must span at least 365 days / intervalo mínimo de 365 dias"
+            )
         self.rng = np.random.default_rng(random_state)
         self._faker = Faker("en_US")
         self._faker.seed_instance(random_state)
@@ -140,7 +149,12 @@ class PeopleAnalyticsDataGenerator:
 
     def generate_all(self) -> dict[str, pd.DataFrame]:
         """Generate all 7 tables in dependency order."""
-        logger.info("Generating {} employees from {} to {}", self.n_employees, self.start_date.date(), self.end_date.date())
+        logger.info(
+            "Generating {} employees from {} to {}",
+            self.n_employees,
+            self.start_date.date(),
+            self.end_date.date(),
+        )
 
         self._generate_employees()
         self._generate_absences()
@@ -203,17 +217,13 @@ class PeopleAnalyticsDataGenerator:
                 if max_tenure_days > min_tenure_days:
                     tenure_days = int(self.rng.integers(min_tenure_days, max_tenure_days))
                     termination_date = hire_date + pd.Timedelta(days=tenure_days)
-                    termination_reason = self.rng.choice(
-                        TERMINATION_REASONS, p=TERM_REASON_WEIGHTS
-                    )
+                    termination_reason = self.rng.choice(TERMINATION_REASONS, p=TERM_REASON_WEIGHTS)
                     is_active = False
 
             salary_range = JOB_LEVELS[level]["salary_range"]
             salary_min, salary_max = int(salary_range[0]), int(salary_range[1])  # type: ignore[index]
             dept_mult = float(DEPARTMENTS[dept]["salary_mult"])
-            base_salary = round(
-                float(self.rng.uniform(salary_min, salary_max)) * dept_mult, 2
-            )
+            base_salary = round(float(self.rng.uniform(salary_min, salary_max)) * dept_mult, 2)
 
             employment_type = self.rng.choice(
                 ["Full-Time", "Part-Time", "Contract"], p=[0.85, 0.08, 0.07]
@@ -264,7 +274,7 @@ class PeopleAnalyticsDataGenerator:
             hire = pd.Timestamp(emp["hire_date"])
             end = (
                 pd.Timestamp(emp["termination_date"])
-                if emp["termination_date"]
+                if pd.notna(emp["termination_date"])
                 else self.end_date
             )
             tenure_days = (end - hire).days
@@ -287,9 +297,7 @@ class PeopleAnalyticsDataGenerator:
                 else:
                     hours = float(self.rng.choice([2, 4, 6, 8], p=[0.1, 0.25, 0.25, 0.4]))
 
-                is_approved = self.rng.choice(
-                    [True, False], p=[0.92, 0.08]
-                )
+                is_approved = self.rng.choice([True, False], p=[0.92, 0.08])
 
                 records.append(
                     {
@@ -318,7 +326,7 @@ class PeopleAnalyticsDataGenerator:
             hire = pd.Timestamp(emp["hire_date"])
             end = (
                 pd.Timestamp(emp["termination_date"])
-                if emp["termination_date"]
+                if pd.notna(emp["termination_date"])
                 else self.end_date
             )
             base_monthly = emp["base_annual_salary"] / 12
@@ -377,15 +385,13 @@ class PeopleAnalyticsDataGenerator:
             hire = pd.Timestamp(emp["hire_date"])
             end = (
                 pd.Timestamp(emp["termination_date"])
-                if emp["termination_date"]
+                if pd.notna(emp["termination_date"])
                 else self.end_date
             )
             tenure_years = (end - hire).days / 365
 
             promo_prob_per_year = 0.12
-            n_promos = self.rng.binomial(
-                max(0, int(tenure_years)), promo_prob_per_year
-            )
+            n_promos = self.rng.binomial(max(0, int(tenure_years)), promo_prob_per_year)
             current_level = emp["job_level"]
             current_dept = emp["department"]
             current_title = emp["job_title"]
@@ -467,7 +473,7 @@ class PeopleAnalyticsDataGenerator:
             hire = pd.Timestamp(emp["hire_date"])
             end = (
                 pd.Timestamp(emp["termination_date"])
-                if emp["termination_date"]
+                if pd.notna(emp["termination_date"])
                 else self.end_date
             )
             tenure_days = (end - hire).days
@@ -482,9 +488,7 @@ class PeopleAnalyticsDataGenerator:
             for idx in selected:
                 course_name, category, is_mandatory = course_pool[idx]
 
-                start = hire + pd.Timedelta(
-                    days=int(self.rng.integers(7, max(8, tenure_days)))
-                )
+                start = hire + pd.Timedelta(days=int(self.rng.integers(7, max(8, tenure_days))))
                 hours = round(float(self.rng.uniform(2, 40)), 1)
                 duration_days = max(1, int(hours / 2))
 
@@ -497,9 +501,7 @@ class PeopleAnalyticsDataGenerator:
                     completion_date = start + pd.Timedelta(days=duration_days)
                     score = round(float(self.rng.uniform(60, 100)), 1)
                 elif status == "Dropped":
-                    completion_date = start + pd.Timedelta(
-                        days=max(1, int(duration_days * 0.3))
-                    )
+                    completion_date = start + pd.Timedelta(days=max(1, int(duration_days * 0.3)))
 
                 records.append(
                     {
@@ -530,19 +532,14 @@ class PeopleAnalyticsDataGenerator:
         records = []
         survey_id = 1
 
-        survey_dates = pd.date_range(
-            start=self.start_date, end=self.end_date, freq="QS"
-        )
+        survey_dates = pd.date_range(start=self.start_date, end=self.end_date, freq="QS")
 
         for survey_date in survey_dates:
             survey_type = SURVEY_TYPES[survey_date.quarter - 1]
 
-            active_mask = (
-                (self.employees["hire_date"] <= str(survey_date.date()))
-                & (
-                    self.employees["termination_date"].isna()
-                    | (self.employees["termination_date"] > str(survey_date.date()))
-                )
+            active_mask = (self.employees["hire_date"] <= str(survey_date.date())) & (
+                self.employees["termination_date"].isna()
+                | (self.employees["termination_date"] > str(survey_date.date()))
             )
             active_emps = self.employees[active_mask]
 
@@ -567,19 +564,13 @@ class PeopleAnalyticsDataGenerator:
                         "satisfaction_score": round(
                             float(np.clip(base_engagement + self.rng.normal(0, 0.4), 1, 5)), 2
                         ),
-                        "manager_score": round(
-                            float(np.clip(self.rng.normal(3.6, 0.7), 1, 5)), 2
-                        ),
-                        "growth_score": round(
-                            float(np.clip(self.rng.normal(3.3, 0.8), 1, 5)), 2
-                        ),
+                        "manager_score": round(float(np.clip(self.rng.normal(3.6, 0.7), 1, 5)), 2),
+                        "growth_score": round(float(np.clip(self.rng.normal(3.3, 0.8), 1, 5)), 2),
                         "wellbeing_score": round(
                             float(np.clip(self.rng.normal(3.5, 0.6), 1, 5)), 2
                         ),
                         "overall_score": round(
-                            float(
-                                np.clip(base_engagement + self.rng.normal(0, 0.2), 1, 5)
-                            ),
+                            float(np.clip(base_engagement + self.rng.normal(0, 0.2), 1, 5)),
                             2,
                         ),
                     }
@@ -621,9 +612,7 @@ class PeopleAnalyticsDataGenerator:
 
                 for _ in range(n_applicants):
                     source = self.rng.choice(RECRUITING_SOURCES)
-                    app_date = month + pd.Timedelta(
-                        days=int(self.rng.integers(0, 28))
-                    )
+                    app_date = month + pd.Timedelta(days=int(self.rng.integers(0, 28)))
                     candidate = self._faker.name()
 
                     screening_date = None
@@ -634,9 +623,7 @@ class PeopleAnalyticsDataGenerator:
                     status = "Applied"
 
                     if self.rng.random() < 0.60:
-                        screening_date = app_date + pd.Timedelta(
-                            days=int(self.rng.integers(2, 10))
-                        )
+                        screening_date = app_date + pd.Timedelta(days=int(self.rng.integers(2, 10)))
                         status = "Screened"
 
                         if self.rng.random() < 0.50:
@@ -691,12 +678,8 @@ class PeopleAnalyticsDataGenerator:
                             "interview_date": (
                                 str(interview_date.date()) if interview_date else None
                             ),
-                            "offer_date": (
-                                str(offer_date.date()) if offer_date else None
-                            ),
-                            "hire_date": (
-                                str(hire_date.date()) if hire_date else None
-                            ),
+                            "offer_date": (str(offer_date.date()) if offer_date else None),
+                            "hire_date": (str(hire_date.date()) if hire_date else None),
                             "rejection_date": (
                                 str(rejection_date.date()) if rejection_date else None
                             ),
@@ -750,10 +733,10 @@ def main() -> None:
     ds = settings.data_settings
 
     generator = PeopleAnalyticsDataGenerator(
-        n_employees=args.n_employees or ds.num_employees,
+        n_employees=args.n_employees if args.n_employees is not None else ds.num_employees,
         start_date=ds.date_range_start,
         end_date=ds.date_range_end,
-        random_state=args.seed or ds.seed_random_state,
+        random_state=args.seed if args.seed is not None else ds.seed_random_state,
     )
 
     generator.save_all(

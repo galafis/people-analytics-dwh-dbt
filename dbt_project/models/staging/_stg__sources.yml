@@ -1,15 +1,14 @@
 version: 2
-
 sources:
   - name: raw
-    description: "Raw People Analytics seed data (synthetic HR tables)"
+    description: Raw People Analytics seed data (synthetic HR tables)
     schema: main
     tables:
       - name: raw_employees
-        description: "Master employee records with hire/termination lifecycle"
+        description: Master employee records with hire/termination lifecycle
         columns:
           - name: employee_id
-            description: "Unique employee identifier"
+            description: Unique employee identifier
             data_tests:
               - unique
               - not_null
@@ -20,18 +19,34 @@ sources:
             data_tests:
               - not_null
               - accepted_values:
-                  values: ["Engineering", "Sales", "Operations", "Customer Support", "Marketing", "Finance", "HR", "Product"]
+                  arguments:
+                    values:
+                      - Engineering
+                      - Sales
+                      - Operations
+                      - Customer Support
+                      - Marketing
+                      - Finance
+                      - HR
+                      - Product
           - name: employment_type
             data_tests:
               - accepted_values:
-                  values: ["Full-Time", "Part-Time", "Contract"]
+                  arguments:
+                    values:
+                      - Full-Time
+                      - Part-Time
+                      - Contract
           - name: gender
             data_tests:
               - accepted_values:
-                  values: ["Male", "Female", "Non-Binary"]
-
+                  arguments:
+                    values:
+                      - Male
+                      - Female
+                      - Non-Binary
       - name: raw_absences
-        description: "Employee absence events (sick, vacation, personal, etc.)"
+        description: Employee absence events (sick, vacation, personal, etc.)
         columns:
           - name: absence_id
             data_tests:
@@ -41,15 +56,22 @@ sources:
             data_tests:
               - not_null
               - relationships:
-                  to: source('raw', 'raw_employees')
-                  field: employee_id
+                  arguments:
+                    to: source('raw', 'raw_employees')
+                    field: employee_id
           - name: absence_type
             data_tests:
               - accepted_values:
-                  values: ["Sick Leave", "Vacation", "Personal", "Parental", "Bereavement", "Jury Duty"]
-
+                  arguments:
+                    values:
+                      - Sick Leave
+                      - Vacation
+                      - Personal
+                      - Parental
+                      - Bereavement
+                      - Jury Duty
       - name: raw_payroll
-        description: "Monthly payroll/compensation records"
+        description: Monthly payroll/compensation records
         columns:
           - name: payroll_id
             data_tests:
@@ -59,11 +81,11 @@ sources:
             data_tests:
               - not_null
               - relationships:
-                  to: source('raw', 'raw_employees')
-                  field: employee_id
-
+                  arguments:
+                    to: source('raw', 'raw_employees')
+                    field: employee_id
       - name: raw_promotions
-        description: "Career progression and lateral move events"
+        description: Career progression and lateral move events
         columns:
           - name: promotion_id
             data_tests:
@@ -73,11 +95,11 @@ sources:
             data_tests:
               - not_null
               - relationships:
-                  to: source('raw', 'raw_employees')
-                  field: employee_id
-
+                  arguments:
+                    to: source('raw', 'raw_employees')
+                    field: employee_id
       - name: raw_training
-        description: "Course enrollment and completion records"
+        description: Course enrollment and completion records
         columns:
           - name: training_id
             data_tests:
@@ -87,15 +109,20 @@ sources:
             data_tests:
               - not_null
               - relationships:
-                  to: source('raw', 'raw_employees')
-                  field: employee_id
+                  arguments:
+                    to: source('raw', 'raw_employees')
+                    field: employee_id
           - name: status
             data_tests:
               - accepted_values:
-                  values: ["Completed", "In Progress", "Not Started", "Dropped"]
-
+                  arguments:
+                    values:
+                      - Completed
+                      - In Progress
+                      - Not Started
+                      - Dropped
       - name: raw_surveys
-        description: "Quarterly engagement and satisfaction survey responses"
+        description: Quarterly engagement and satisfaction survey responses
         columns:
           - name: survey_id
             data_tests:
@@ -105,15 +132,20 @@ sources:
             data_tests:
               - not_null
               - relationships:
-                  to: source('raw', 'raw_employees')
-                  field: employee_id
+                  arguments:
+                    to: source('raw', 'raw_employees')
+                    field: employee_id
           - name: survey_type
             data_tests:
               - accepted_values:
-                  values: ["Q1 Pulse", "Q2 Pulse", "Q3 Pulse", "Annual Engagement"]
-
+                  arguments:
+                    values:
+                      - Q1 Pulse
+                      - Q2 Pulse
+                      - Q3 Pulse
+                      - Annual Engagement
       - name: raw_recruiting
-        description: "Full hiring funnel from application to hire/rejection"
+        description: Full hiring funnel from application to hire/rejection
         columns:
           - name: application_id
             data_tests:
@@ -122,4 +154,12 @@ sources:
           - name: status
             data_tests:
               - accepted_values:
-                  values: ["Applied", "Screened", "Interviewed", "Offered", "Hired", "Rejected", "Withdrawn"]
+                  arguments:
+                    values:
+                      - Applied
+                      - Screened
+                      - Interviewed
+                      - Offered
+                      - Hired
+                      - Rejected
+                      - Withdrawn

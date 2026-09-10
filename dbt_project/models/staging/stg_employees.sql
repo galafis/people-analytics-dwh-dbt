@@ -25,11 +25,11 @@ cleaned as (
 
         -- derived fields
         round(
-            datediff('day', cast(hire_date as date), coalesce(cast(termination_date as date), current_date)) / 365.25,
+            datediff('day', cast(hire_date as date), coalesce(cast(termination_date as date), cast('{{ var('as_of_date', '2024-12-31') }}' as date))) / 365.25,
             2
         ) as tenure_years,
 
-        datediff('year', cast(birth_date as date), current_date) as age,
+        datediff('year', cast(birth_date as date), cast('{{ var('as_of_date', '2024-12-31') }}' as date)) as age,
 
         case
             when termination_reason is not null

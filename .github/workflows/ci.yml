@@ -1,86 +1,32 @@
 name: CI
-
-on:
-  push:
-    branches: [master, main]
-  pull_request:
-    branches: [master, main]
-
+on: [push, pull_request, workflow_dispatch]
+permissions:
+  contents: read
 jobs:
-  lint:
-    name: Lint & Type Check
+  validate:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-
       - uses: actions/setup-python@v5
         with:
-          python-version: "3.11"
-
-      - name: Install dependencies
-        run: pip install -r requirements-dev.txt
-
-      - name: Ruff lint
-        run: ruff check src/ tests/
-
-      - name: Ruff format check
-        run: ruff format --check src/ tests/
-
-      - name: mypy type check
-        run: mypy src/ --ignore-missing-imports
-
-  test-python:
-    name: Python Tests (py${{ matrix.python-version }})
-    runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        python-version: ["3.10", "3.11", "3.12"]
-    steps:
-      - uses: actions/checkout@v4
-
-      - uses: actions/setup-python@v5
-        with:
-          python-version: ${{ matrix.python-version }}
-
-      - name: Install dependencies
-        run: pip install -r requirements-dev.txt
-
-      - name: Run pytest
-        run: pytest tests/ -v --tb=short
-
-  test-dbt:
-    name: dbt Build & Test
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-
-      - uses: actions/setup-python@v5
-        with:
-          python-version: "3.11"
-
-      - name: Install dependencies
-        run: pip install -r requirements.txt
-
-      - name: Generate synthetic data
-        run: python -m src.generate_data --n-employees 500
-
-      - name: dbt deps
-        run: cd dbt_project && dbt deps
-
-      - name: dbt seed
-        run: cd dbt_project && dbt seed --target dev
-
-      - name: dbt run
-        run: cd dbt_project && dbt run --target dev
-
-      - name: dbt test
-        run: cd dbt_project && dbt test --target dev
-
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: requirements-validation.txt
+      - run: python -m pip install -r requirements-validation.txt
+      - run: python -m pytest -q
+      - run: python -m examples.review_demo
+      - run: python -m ruff check src tests
+      - run: python -m ruff format --check src tests examples
+      - run: python -m mypy src --ignore-missing-imports
+      - run: python -m src.generate_data --n-employees 200
+      - run: dbt deps
+        working-directory: dbt_project
+      - run: dbt build --profiles-dir . --target ci
+        working-directory: dbt_project
+        env:
+          DBT_SEND_ANONYMOUS_USAGE_STATS: "false"
   docker:
-    name: Docker Build
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-
-      - name: Build Docker image
-        run: docker build -f docker/Dockerfile -t people-analytics-dwh .
+      - run: docker build -f docker/Dockerfile -t people-analytics-dwh .

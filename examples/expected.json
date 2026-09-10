@@ -1,0 +1,120 @@
+{
+  "synthetic": true,
+  "seed": 42,
+  "employees": 200,
+  "tables": {
+    "raw_employees": {
+      "rows": 200,
+      "columns": [
+        "employee_id",
+        "first_name",
+        "last_name",
+        "email",
+        "gender",
+        "birth_date",
+        "hire_date",
+        "termination_date",
+        "termination_reason",
+        "department",
+        "job_title",
+        "job_level",
+        "manager_id",
+        "location",
+        "employment_type",
+        "base_annual_salary",
+        "is_active"
+      ]
+    },
+    "raw_absences": {
+      "rows": 4871,
+      "columns": [
+        "absence_id",
+        "employee_id",
+        "absence_date",
+        "absence_type",
+        "hours_absent",
+        "is_approved"
+      ]
+    },
+    "raw_payroll": {
+      "rows": 7677,
+      "columns": [
+        "payroll_id",
+        "employee_id",
+        "pay_period_start",
+        "pay_period_end",
+        "base_salary",
+        "overtime_pay",
+        "bonus",
+        "deductions",
+        "net_pay",
+        "currency"
+      ]
+    },
+    "raw_promotions": {
+      "rows": 60,
+      "columns": [
+        "promotion_id",
+        "employee_id",
+        "promotion_date",
+        "previous_job_title",
+        "new_job_title",
+        "previous_job_level",
+        "new_job_level",
+        "previous_department",
+        "new_department",
+        "salary_change_pct"
+      ]
+    },
+    "raw_training": {
+      "rows": 790,
+      "columns": [
+        "training_id",
+        "employee_id",
+        "course_name",
+        "course_category",
+        "start_date",
+        "completion_date",
+        "status",
+        "hours",
+        "score",
+        "is_mandatory"
+      ]
+    },
+    "raw_surveys": {
+      "rows": 1915,
+      "columns": [
+        "survey_id",
+        "employee_id",
+        "survey_date",
+        "survey_type",
+        "engagement_score",
+        "satisfaction_score",
+        "manager_score",
+        "growth_score",
+        "wellbeing_score",
+        "overall_score"
+      ]
+    },
+    "raw_recruiting": {
+      "rows": 5138,
+      "columns": [
+        "application_id",
+        "requisition_id",
+        "department",
+        "job_title",
+        "job_level",
+        "candidate_name",
+        "source",
+        "application_date",
+        "screening_date",
+        "interview_date",
+        "offer_date",
+        "hire_date",
+        "rejection_date",
+        "status",
+        "recruiter"
+      ]
+    }
+  }
+}

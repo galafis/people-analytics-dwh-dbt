@@ -5,7 +5,7 @@ description = "People Analytics Data Warehouse with dbt, DuckDB, semantic layers
 readme = "README.md"
 license = {text = "MIT"}
 requires-python = ">=3.10"
-authors = [{name = "Gabriel Demetrios Lafis", email = "gabriel.lafis@example.com"}]
+authors = [{name = "Gabriel Demetrios Lafis", email = "gabrieldemetrioslafis@usp.br"}]
 
 [tool.ruff]
 target-version = "py310"

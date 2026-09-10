@@ -20,9 +20,20 @@ class TestEmployees:
 
     def test_required_columns(self, all_tables: dict) -> None:
         expected = {
-            "employee_id", "first_name", "last_name", "email", "gender",
-            "birth_date", "hire_date", "department", "job_title", "job_level",
-            "location", "employment_type", "base_annual_salary", "is_active",
+            "employee_id",
+            "first_name",
+            "last_name",
+            "email",
+            "gender",
+            "birth_date",
+            "hire_date",
+            "department",
+            "job_title",
+            "job_level",
+            "location",
+            "employment_type",
+            "base_annual_salary",
+            "is_active",
         }
         assert expected.issubset(set(all_tables["raw_employees"].columns))
 
@@ -150,8 +161,12 @@ class TestSurveys:
     def test_scores_bounded(self, all_tables: dict) -> None:
         df = all_tables["raw_surveys"]
         score_cols = [
-            "engagement_score", "satisfaction_score", "manager_score",
-            "growth_score", "wellbeing_score", "overall_score",
+            "engagement_score",
+            "satisfaction_score",
+            "manager_score",
+            "growth_score",
+            "wellbeing_score",
+            "overall_score",
         ]
         for col in score_cols:
             assert df[col].min() >= 1.0, f"{col} has values below 1.0"
@@ -181,7 +196,12 @@ class TestAllTables:
 
     def test_table_names(self, all_tables: dict) -> None:
         expected = {
-            "raw_employees", "raw_absences", "raw_payroll",
-            "raw_promotions", "raw_training", "raw_surveys", "raw_recruiting",
+            "raw_employees",
+            "raw_absences",
+            "raw_payroll",
+            "raw_promotions",
+            "raw_training",
+            "raw_surveys",
+            "raw_recruiting",
         }
         assert set(all_tables.keys()) == expected

@@ -15,8 +15,8 @@ turnover as (
         involuntary_terminations,
         new_hires,
 
-        -- turnover rate = terminations / avg_headcount * 100
-        -- avg_headcount approximated as (beginning + ending) / 2
+        -- Teaching definition: terminations / ending headcount * 100.
+        -- Zero ending headcount produces zero; do not interpret it as no departures.
         case
             when active_headcount > 0
             then round(terminations * 100.0 / active_headcount, 2)
