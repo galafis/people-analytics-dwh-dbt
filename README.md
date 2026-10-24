@@ -1,11 +1,28 @@
 # People Analytics Data Warehouse
 
-### Data Warehouse de People Analytics
+**Data engineering · Engenharia de dados**
 
-[![Validation](https://github.com/galafis/people-analytics-dwh-dbt/actions/workflows/ci.yml/badge.svg)](https://github.com/galafis/people-analytics-dwh-dbt/actions/workflows/ci.yml)
-[English](#english) · [Português](#portugues) · [Examples / Exemplos](examples/review_demo.py) · [Validation / Validação](docs/VALIDATION.md)
+<p align="center"><img src="assets/project-overview.svg" width="960" alt="Workflow illustration: Seeded records → dbt models → Analytical marts"></p>
 
-**Data engineering / Engenharia de dados** · Working prototype / Protótipo funcional · Gabriel Demetrios Lafis
+[![Checks](https://github.com/galafis/people-analytics-dwh-dbt/actions/workflows/ci.yml/badge.svg)](https://github.com/galafis/people-analytics-dwh-dbt/actions/workflows/ci.yml)
+[English](#english) · [Português](#portugues) · [Guided tour / Visita guiada](docs/SHOWCASE.md) · [Validation / Validação](docs/VALIDATION.md)
+
+> **EN:** Can every analytical metric be traced back to a reproducible source?<br>
+> **PT:** Cada métrica analítica pode ser rastreada até uma fonte reproduzível?
+
+## Start here · Comece aqui
+
+| Goal · Objetivo | Where to go · Por onde começar |
+| --- | --- |
+| Understand a real example · Entender um exemplo concreto | [Walkthrough / Roteiro](examples/review_demo.py) |
+| Reproduce and compare · Reproduzir e comparar | [Evidence tour / Visita às evidências](docs/SHOWCASE.md) |
+| Inspect the checks · Inspecionar as verificações | [Validation record / Registro de validação](docs/VALIDATION.md) · [CI](https://github.com/galafis/people-analytics-dwh-dbt/actions/workflows/ci.yml) |
+
+**Example result · Resultado do exemplo:** Seven generated tables; referential integrity is checked before the example summary is printed. / Sete tabelas geradas; a integridade referencial é verificada antes da impressão do resumo.
+
+**Try a comparison · Experimente uma comparação**<br>
+**EN:** Keep seed 42 fixed, change the population and inspect foreign-key relationships before building the marts.<br>
+**PT:** Mantenha a semente 42, altere a população e inspecione as chaves antes de construir as tabelas analíticas.
 
 <a id="english"></a>
 
